@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface ChatBubbleProps {
@@ -7,7 +6,6 @@ interface ChatBubbleProps {
   isLink?: boolean;
   href?: string;
   downloadName?: string;
-  delay?: number;
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ 
@@ -15,8 +13,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   isUser = false, 
   isLink = false, 
   href, 
-  downloadName,
-  delay = 0 
+  downloadName
 }) => {
   const bubbleClass = isUser 
     ? "bg-blue-500 text-white ml-auto rounded-tl-2xl rounded-tr-lg rounded-bl-2xl rounded-br-2xl" 
@@ -37,13 +34,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   ) : message;
 
   return (
-    <div 
-      className={`${containerClass} mb-2 animate-fade-in px-4`}
-      style={{ 
-        animationDelay: `${delay}ms`,
-        animationFillMode: 'both'
-      }}
-    >
+    <div className={`${containerClass} mb-2 animate-smooth-fade-in px-4`}>
       <div className={`${bubbleClass} px-4 py-2 max-w-xs lg:max-w-sm shadow-sm`}>
         <p className="text-sm leading-relaxed whitespace-pre-line">{content}</p>
       </div>

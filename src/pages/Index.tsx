@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ChatHeader from '../components/ChatHeader';
 import ChatBubble from '../components/ChatBubble';
 import TypingIndicator from '../components/TypingIndicator';
@@ -7,9 +6,9 @@ import ProjectCard from '../components/ProjectCard';
 import MessageInput from '../components/MessageInput';
 
 interface Message {
+  id: string;
   text: string;
   isUser: boolean;
-  delay?: number;
   isLink?: boolean;
   href?: string;
   downloadName?: string;
@@ -24,6 +23,8 @@ const Index = () => {
   const [awaitingInput, setAwaitingInput] = useState(false);
   const [inputPlaceholder, setInputPlaceholder] = useState('Message');
   const [currentTypingMessage, setCurrentTypingMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const userMessages = [
     "Hey, who's this?",
@@ -36,41 +37,50 @@ const Index = () => {
     // Stage 0: Initial greeting
     {
       messages: [
-        { text: "👋 Hey there", isUser: false, delay: 1000 },
-        { text: "I'm Kino", isUser: false, delay: 1500 },
-        { text: "I build full-stack apps with NestJS, .NET Core, and React.", isUser: false, delay: 2000 },
+        { text: "👋 Hey there", isUser: false },
+        { text: "I'm Kino", isUser: false },
+        { text: "I build full-stack apps with NestJS, .NET Core, and React.", isUser: false },
       ],
       nextPlaceholder: "Message"
     },
     // Stage 1: Current work
     {
       messages: [
-        { text: "Currently building a driving school management system.", isUser: false, delay: 500 },
-        { text: "Just finished a scraper that uses OpenAI to turn raw HTML into clean job data.", isUser: false, delay: 1500 },
+        { text: "Currently building a driving school management system.", isUser: false },
+        { text: "Just finished a scraper that uses OpenAI to turn raw HTML into clean job data.", isUser: false },
       ],
       nextPlaceholder: "Message"
     },
     // Stage 2: Projects
     {
       messages: [
-        { text: "Want to see what I've been working on?", isUser: false, delay: 500 },
-        { text: "", isUser: false, delay: 1000, isProjects: true },
+        { text: "Want to see what I've been working on?", isUser: false },
+        { text: "", isUser: false, isProjects: true },
       ],
       nextPlaceholder: "Message"
     },
     // Stage 3: Contact
     {
       messages: [
-        { text: "Not looking for freelance — focused on landing a dev role.", isUser: false, delay: 500 },
-        { text: "Let's connect 👇", isUser: false, delay: 1000 },
-        { text: "💼 LinkedIn", isUser: false, delay: 1500, isLink: true, href: "https://linkedin.com" },
-        { text: "📧 Email Me", isUser: false, delay: 2000, isLink: true, href: "mailto:kino@example.com" },
-        { text: "📄 Download Resume", isUser: false, delay: 2500, isLink: true, href: "#", downloadName: "Kino_Resume.pdf" },
-        { text: "👾 Portfolio v1.0 – Last updated May 2025", isUser: false, delay: 3000, isFooter: true },
+        { text: "Not looking for freelance — focused on landing a dev role.", isUser: false },
+        { text: "Let's connect 👇", isUser: false },
+        { text: "💼 LinkedIn", isUser: false, isLink: true, href: "https://linkedin.com" },
+        { text: "📧 Email Me", isUser: false, isLink: true, href: "mailto:kino@example.com" },
+        { text: "📄 Download Resume", isUser: false, isLink: true, href: "#", downloadName: "Kino_Resume.pdf" },
+        { text: "👾 Portfolio v1.0 – Last updated May 2025", isUser: false, isFooter: true },
       ],
       nextPlaceholder: ""
     }
   ];
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, showTyping]);
 
   useEffect(() => {
     // Start with the first user message
@@ -80,49 +90,58 @@ const Index = () => {
     }, 1000);
   }, []);
 
-  const playStage = (stageIndex: number) => {
+  const addMessage = (messageData: Omit<Message, 'id'>) => {
+    const newMessage: Message = {
+      ...messageData,
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+    };
+    setMessages(prev => [...prev, newMessage]);
+  };
+
+  const playStage = async (stageIndex: number) => {
     const stage = conversationStages[stageIndex];
     if (!stage) return;
 
-    let totalStageTime = 0;
-    
-    stage.messages.forEach((msg, index) => {
-      const messageDelay = msg.delay || 0;
-      const typingDuration = index > 0 ? 800 : 0; // Only add typing delay if not the first message
+    // Process each message in the stage with typing indicator
+    for (let i = 0; i < stage.messages.length; i++) {
+      const msg = stage.messages[i];
       
-      setTimeout(() => {
-        if (index > 0) {
-          setShowTyping(true);
-          setTimeout(() => {
-            setShowTyping(false);
-            setMessages(prev => [...prev, msg]);
-          }, 800);
-        } else {
-          setMessages(prev => [...prev, msg]);
-        }
-      }, totalStageTime + messageDelay);
-      
-      // Calculate when this message will be fully displayed
-      totalStageTime += messageDelay + typingDuration;
-    });
+      // Wait a bit between messages for natural pacing
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
 
-    // Wait until all messages in this stage are done before showing next user message
+      // Show typing indicator
+      setShowTyping(true);
+      
+      // Wait for typing duration (1-2 seconds)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Hide typing and add message
+      setShowTyping(false);
+      addMessage(msg);
+      
+      // Small delay before next message
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    // Wait a bit, then show next user message prompt
     setTimeout(() => {
       const nextUserMessageIndex = stageIndex + 1;
       if (nextUserMessageIndex < userMessages.length) {
         setCurrentTypingMessage(userMessages[nextUserMessageIndex]);
         setAwaitingInput(true);
       }
-    }, totalStageTime + 1000); // Add extra 1 second buffer after all messages are displayed
+    }, 1000);
   };
 
   const handleUserMessage = (message: string) => {
     // Add user message
-    setMessages(prev => [...prev, { text: message, isUser: true }]);
+    addMessage({ text: message, isUser: true });
     setAwaitingInput(false);
     setCurrentTypingMessage('');
     
-    // Move to next stage
+    // Move to next stage after a short delay
     setTimeout(() => {
       playStage(currentStage);
       setCurrentStage(prev => prev + 1);
@@ -133,10 +152,10 @@ const Index = () => {
     // Typing animation is complete, user can now send
   };
 
-  const renderMessage = (msg: Message, index: number) => {
+  const renderMessage = (msg: Message) => {
     if (msg.isProjects) {
       return (
-        <div key={index} className="px-4 mb-4 space-y-3 animate-fade-in" style={{ animationDelay: `${msg.delay}ms`, animationFillMode: 'both' }}>
+        <div key={msg.id} className="px-4 mb-4 space-y-3 animate-fade-in">
           <ProjectCard
             title="🛠️ Driving School App"
             tech="📦 React + Supabase"
@@ -157,7 +176,7 @@ const Index = () => {
 
     if (msg.isFooter) {
       return (
-        <div key={index} className="flex justify-center mb-2 px-4 animate-fade-in" style={{ animationDelay: `${msg.delay}ms`, animationFillMode: 'both' }}>
+        <div key={msg.id} className="flex justify-center mb-2 px-4 animate-fade-in">
           <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">
             {msg.text}
           </div>
@@ -167,35 +186,48 @@ const Index = () => {
 
     return (
       <ChatBubble
-        key={index}
+        key={msg.id}
         message={msg.text}
         isUser={msg.isUser}
         isLink={msg.isLink}
         href={msg.href}
         downloadName={msg.downloadName}
-        delay={msg.delay}
       />
     );
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen bg-white flex flex-col">
       <ChatHeader />
       
-      <div className="max-w-md mx-auto">
-        {/* Messages Container */}
-        <div className="pt-6 pb-20">
-          {messages.map((msg, index) => renderMessage(msg, index))}
-          {showTyping && <TypingIndicator delay={0} duration={2000} />}
+      <div className="flex-1 max-w-md mx-auto w-full flex flex-col">
+        {/* Messages Container - iPhone style with messages flowing from bottom */}
+        <div 
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto pt-6 pb-4"
+          style={{ 
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end'
+          }}
+        >
+          <div className="flex flex-col">
+            {messages.map(renderMessage)}
+            {showTyping && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
 
-        <MessageInput
-          placeholder={inputPlaceholder}
-          onSend={handleUserMessage}
-          disabled={!awaitingInput}
-          currentMessage={currentTypingMessage}
-          onTypingComplete={handleTypingComplete}
-        />
+        {/* Fixed Message Input */}
+        <div className="flex-shrink-0">
+          <MessageInput
+            placeholder={inputPlaceholder}
+            onSend={handleUserMessage}
+            disabled={!awaitingInput}
+            currentMessage={currentTypingMessage}
+            onTypingComplete={handleTypingComplete}
+          />
+        </div>
       </div>
     </div>
   );
