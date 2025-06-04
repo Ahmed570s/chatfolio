@@ -23,6 +23,7 @@ const Index = () => {
   const [awaitingInput, setAwaitingInput] = useState(false);
   const [inputPlaceholder, setInputPlaceholder] = useState('Message');
   const [currentTypingMessage, setCurrentTypingMessage] = useState('');
+  const [chatCompleted, setChatCompleted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +33,17 @@ const Index = () => {
     "Can I see your projects?",
     "How can I contact you?"
   ];
+
+  const emojiResponses = {
+    bug: "🐛 Bug squashed. Back to shipping.",
+    shipit: "🚀 Code shipped. Time for coffee.",
+    coffee: "☕ Recharging with caffeine.",
+    fix: "🔧 Fix deployed. Hope nothing breaks.",
+    fire: "🔥 On a roll today.",
+    clean: "🧼 Refactored that mess. So fresh.",
+    deploy: "📦 Deployed. No turning back.",
+    sleep: "😴 Shipping dreams now."
+  };
 
   const conversationStages = [
     // Stage 0: Initial greeting
@@ -133,12 +145,18 @@ const Index = () => {
       await new Promise(resolve => setTimeout(resolve, 300));
     }
 
-    // Wait a bit, then show next user message prompt
+    // Check if this was the last stage
+    const isLastStage = stageIndex === conversationStages.length - 1;
+    
+    // Wait a bit, then show next user message prompt or mark as completed
     setTimeout(() => {
       const nextUserMessageIndex = stageIndex + 1;
-      if (nextUserMessageIndex < userMessages.length) {
+      if (nextUserMessageIndex < userMessages.length && !isLastStage) {
         setCurrentTypingMessage(userMessages[nextUserMessageIndex]);
         setAwaitingInput(true);
+      } else {
+        // Chat flow is complete, show emoji button
+        setChatCompleted(true);
       }
     }, 1000);
   };
@@ -158,6 +176,21 @@ const Index = () => {
 
   const handleTypingComplete = () => {
     // Typing animation is complete, user can now send
+  };
+
+  const handleEmojiClick = async (emojiKey: keyof typeof emojiResponses) => {
+    // Show typing indicator
+    setShowTyping(true);
+    
+    // Wait for typing duration
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Hide typing and add emoji response
+    setShowTyping(false);
+    addMessage({ 
+      text: emojiResponses[emojiKey], 
+      isUser: false 
+    });
   };
 
   const renderMessage = (msg: Message) => {
@@ -234,6 +267,8 @@ const Index = () => {
             disabled={!awaitingInput}
             currentMessage={currentTypingMessage}
             onTypingComplete={handleTypingComplete}
+            showEmojiButton={chatCompleted}
+            onEmojiClick={handleEmojiClick}
           />
         </div>
       </div>
