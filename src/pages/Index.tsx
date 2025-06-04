@@ -204,22 +204,29 @@ const Index = () => {
   const renderMessage = (msg: Message) => {
     if (msg.isProjects) {
       return (
-        <div key={msg.id} className="flex justify-start mb-4 px-4 animate-fade-in">
-          <div className="w-full max-w-[85%] space-y-3">
-            <ProjectCard
-              title="🛠️ Driving School App"
-              tech="📦 React + Supabase"
-              icon="🚗"
-              href="https://github.com"
-              delay={0}
-            />
-            <ProjectCard
-              title="🤖 AI Job Scraper"
-              tech="🧠 Python + OpenAI API"
-              icon="🔍"
-              href="https://github.com"
-              delay={200}
-            />
+        <div 
+          key={msg.id} 
+          className="flex justify-start mb-4 px-4 animate-fade-in"
+          style={{ backgroundColor: isDark ? '#040a17' : 'white' }}
+        >
+          <div 
+            className="w-full max-w-[85%] space-y-3"
+            style={{ backgroundColor: isDark ? '#040a17' : 'white' }}
+          >
+          <ProjectCard
+            title="🛠️ Driving School App"
+            tech="📦 React + Supabase"
+            icon="🚗"
+            href="https://github.com"
+            delay={0}
+          />
+          <ProjectCard
+            title="🤖 AI Job Scraper"
+            tech="🧠 Python + OpenAI API"
+            icon="🔍"
+            href="https://github.com"
+            delay={200}
+          />
           </div>
         </div>
       );
@@ -228,10 +235,7 @@ const Index = () => {
     if (msg.isFooter) {
       return (
         <div key={msg.id} className="flex justify-center mb-2 px-4 pt-4 pb-4 animate-fade-in">
-          <div 
-            className="text-gray-600 dark:text-gray-400 px-3 py-1 rounded-full text-xs"
-            style={{ backgroundColor: isDark ? '#1a1a2e' : '#f3f4f6' }}
-          >
+          <div className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-3 py-1 rounded-full text-xs">
             {msg.text}
           </div>
         </div>
@@ -258,7 +262,10 @@ const Index = () => {
       <ChatHeader />
       
       {/* Messages Container - Scrollable area */}
-      <div className="flex-1 max-w-md mx-auto w-full">
+      <div 
+        className="flex-1 max-w-md mx-auto w-full"
+        style={{ backgroundColor: isDark ? '#040a17' : 'white' }}
+      >
         <div 
           ref={chatContainerRef}
           className="h-full overflow-y-auto pt-6"
@@ -266,18 +273,22 @@ const Index = () => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            paddingBottom: '100px' // Add space for fixed input
+            paddingBottom: '100px', // Add space for fixed input
+            backgroundColor: isDark ? '#040a17' : 'white'
           }}
         >
-          <div className="flex flex-col">
+          <div 
+            className="flex flex-col"
+            style={{ backgroundColor: isDark ? '#040a17' : 'white' }}
+          >
             {messages.map(renderMessage)}
             {showTyping && <TypingIndicator />}
             <div ref={messagesEndRef} />
           </div>
+          </div>
         </div>
-      </div>
 
-      {/* Fixed Message Input */}
+        {/* Fixed Message Input */}
       <div 
         className="fixed bottom-0 left-0 right-0 z-10" 
         style={{ backgroundColor: isDark ? '#040a17' : 'white' }}

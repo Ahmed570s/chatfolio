@@ -98,6 +98,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Override body background for consistent dark theme */
+  body.dark {
+    background-color: #040a17 !important;
+  }
 }
 
 /* Enhanced animations for typing indicator and messages */

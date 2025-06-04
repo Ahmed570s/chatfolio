@@ -24,6 +24,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (savedTheme === 'dark') {
       setIsDark(true);
       document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
     }
   }, []);
 
@@ -33,9 +34,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     if (newTheme) {
       document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
   };
