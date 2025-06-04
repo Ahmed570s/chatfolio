@@ -16,8 +16,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
   downloadName
 }) => {
   const bubbleClass = isUser 
-    ? "bg-blue-500 text-white ml-auto rounded-tl-2xl rounded-tr-lg rounded-bl-2xl rounded-br-2xl" 
-    : "bg-gray-200 text-gray-900 mr-auto rounded-tl-lg rounded-tr-2xl rounded-bl-2xl rounded-br-2xl";
+    ? "bg-blue-500 dark:bg-blue-600 text-white ml-auto rounded-tl-2xl rounded-tr-lg rounded-bl-2xl rounded-br-2xl" 
+    : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 mr-auto rounded-tl-lg rounded-tr-2xl rounded-bl-2xl rounded-br-2xl";
 
   const containerClass = isUser ? "flex justify-end" : "flex justify-start";
 
