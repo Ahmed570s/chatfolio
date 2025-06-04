@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface ProjectCardProps {
@@ -12,7 +11,7 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ title, tech, icon, href, delay = 0 }) => {
   return (
     <div 
-      className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow animate-fade-in"
+      className="bg-gray-200 rounded-tl-lg rounded-tr-2xl rounded-bl-2xl rounded-br-2xl p-4 shadow-sm hover:shadow-md transition-shadow animate-fade-in"
       style={{ 
         animationDelay: `${delay}ms`,
         animationFillMode: 'both'

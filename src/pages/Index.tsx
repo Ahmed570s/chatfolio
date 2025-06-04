@@ -102,9 +102,17 @@ const Index = () => {
     const stage = conversationStages[stageIndex];
     if (!stage) return;
 
-    // Process each message in the stage with typing indicator
+    // Process each message in the stage with typing indicator, except footer
     for (let i = 0; i < stage.messages.length; i++) {
       const msg = stage.messages[i];
+      
+      // Skip typing indicator for footer messages
+      if ('isFooter' in msg && msg.isFooter) {
+        // Wait a bit, then add footer directly without typing
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        addMessage(msg);
+        continue;
+      }
       
       // Wait a bit between messages for natural pacing
       if (i > 0) {
@@ -176,7 +184,7 @@ const Index = () => {
 
     if (msg.isFooter) {
       return (
-        <div key={msg.id} className="flex justify-center mb-2 px-4 animate-fade-in">
+        <div key={msg.id} className="flex justify-center mb-2 px-4 pt-4 animate-fade-in">
           <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">
             {msg.text}
           </div>
