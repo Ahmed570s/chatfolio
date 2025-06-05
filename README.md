@@ -183,9 +183,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 Questions? Suggestions? Found this useful? 
 
-- **GitHub**: [Your GitHub Profile](https://github.com/yourusername)  
-- **Email**: your.email@example.com
-- **LinkedIn**: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- **GitHub**: [Ahmed570s](https://github.com/Ahmed570s)  
+- **Email**: Ahmed570V2@gmail.com
 
 ---
 
