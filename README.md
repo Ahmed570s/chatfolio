@@ -55,7 +55,7 @@ A unique developer portfolio that tells your story through an interactive iPhone
 
 3. **Start development server**
    ```bash
-npm run dev
+   npm run dev
 ```
 
 4. **Open your browser**
